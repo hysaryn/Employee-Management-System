@@ -2,6 +2,7 @@ package net.javaguides.employeeservice.service.impl;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.javaguides.employeeservice.dto.APIResponseDto;
 import net.javaguides.employeeservice.dto.DepartmentDto;
@@ -18,6 +19,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+  private static final Logger logger = Logger.getLogger(EmployeeServiceImpl.class.getName());
+
   private EmployeeRepository employeeRepository;
 //  private RestTemplate restTemplate;
   private WebClient webClient;
@@ -49,6 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
   @Override
   public APIResponseDto getEmployeeById(Long employeeId) {
+    logger.info("inside getEmployeeById method");
     Employee employee = employeeRepository.findById(employeeId).get();
 
 //    ResponseEntity<DepartmentDto> responseEntity = restTemplate.getForEntity("http://localhost:8080/api/departments/" + employee.getDepartmentCode(),
@@ -80,6 +84,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   public APIResponseDto getDefaultDepartment(Long employeeId, Exception exception) {
+    logger.info("inside getDefaultDepartment method");
     Employee employee = employeeRepository.findById(employeeId).get();
 
     DepartmentDto departmentDto = new DepartmentDto();
